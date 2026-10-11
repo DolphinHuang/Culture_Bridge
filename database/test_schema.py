@@ -9,8 +9,14 @@ class SchemaTests(unittest.TestCase):
     def setUp(self):
         self.db = sqlite3.connect(':memory:')
         self.db.executescript(SCHEMA.read_text(encoding='utf-8-sig'))
-        self.db.executemany('INSERT INTO users(id,auth_subject,role) VALUES(?,?,?)',
-                            [('author','auth-author','student'),('other','auth-other','student'),('reviewer','auth-reviewer','reviewer')])
+        self.db.executemany(
+            'INSERT INTO users(id,auth_subject,email,password_hash,nickname,role) VALUES(?,?,?,?,?,?)',
+            [
+                ('author','auth-author','author@example.test','hash-author','作者','general'),
+                ('other','auth-other','other@example.test','hash-other','同學','general'),
+                ('reviewer','auth-reviewer','reviewer@example.test','hash-reviewer','審查者','reviewer'),
+            ],
+        )
         self.db.execute("INSERT INTO actions VALUES('permit','work-permit',NULL)")
         for version in ('v1','v2'):
             self.db.execute('INSERT INTO action_versions(id,action_id,version_number,title_zh,title_en,applicable_to,created_by) VALUES(?,?,?,?,?,?,?)',
